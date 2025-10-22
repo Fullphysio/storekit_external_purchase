@@ -28,7 +28,7 @@ Run `flutter pub get`.
 
 ## iOS Setup
 1. Enable the entitlement for your App ID on Apple Developer portal.
-2. In Xcode, ensure your target’s `.entitlements` includes:
+2. In Xcode, ensure your target’s `.entitlements` (`Runner.entitlements`) includes:
 
 ```xml
 <key>com.apple.developer.storekit.external-purchase-link</key>
