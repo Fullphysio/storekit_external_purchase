@@ -5,14 +5,34 @@ import 'package:storekit_external_purchase/storekit_external_purchase_method_cha
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 class MockStorekitExternalPurchasePlatform with MockPlatformInterfaceMixin implements StorekitExternalPurchasePlatform {
-  @override
-  Future<String?> getCountryCode() => Future.value('US');
+  int getCountryCodeCallCount = 0;
+  int isExternalPurchaseAvailableCallCount = 0;
+  int canMakePaymentsCallCount = 0;
+  int showNoticeCallCount = 0;
 
   @override
-  Future<bool> isExternalPurchaseAvailable() => Future.value(true);
+  Future<String?> getCountryCode() async {
+    getCountryCodeCallCount++;
+    return 'US';
+  }
 
   @override
-  Future<NoticeResult> showNotice(NoticeType noticeType) => Future.value(NoticeResult.continued);
+  Future<bool> isExternalPurchaseAvailable() async {
+    isExternalPurchaseAvailableCallCount++;
+    return true;
+  }
+
+  @override
+  Future<bool> canMakePayments() async {
+    canMakePaymentsCallCount++;
+    return true;
+  }
+
+  @override
+  Future<NoticeResult> showNotice(NoticeType noticeType) async {
+    showNoticeCallCount++;
+    return NoticeResult.continued;
+  }
 }
 
 class MockStorekitExternalPurchasePlatformNull
@@ -25,29 +45,78 @@ class MockStorekitExternalPurchasePlatformNull
   Future<bool> isExternalPurchaseAvailable() => Future.value(false);
 
   @override
+  Future<bool> canMakePayments() => Future.value(false);
+
+  @override
   Future<NoticeResult> showNotice(NoticeType noticeType) => Future.value(NoticeResult.cancelled);
 }
 
 void main() {
   final StorekitExternalPurchasePlatform initialPlatform = StorekitExternalPurchasePlatform.instance;
 
-  test('$MethodChannelStorekitExternalPurchase is the default instance', () {
-    expect(initialPlatform, isInstanceOf<MethodChannelStorekitExternalPurchase>());
-  });
+  group('StorekitExternalPurchase Main Plugin Class', () {
+    test('$MethodChannelStorekitExternalPurchase is the default instance', () {
+      expect(initialPlatform, isInstanceOf<MethodChannelStorekitExternalPurchase>());
+    });
 
-  test('getCountryCode returns value', () async {
-    StorekitExternalPurchase storekitExternalPurchasePlugin = StorekitExternalPurchase();
-    MockStorekitExternalPurchasePlatform fakePlatform = MockStorekitExternalPurchasePlatform();
-    StorekitExternalPurchasePlatform.instance = fakePlatform;
+    group('getCountryCode', () {
+      test('returns value when available', () async {
+        StorekitExternalPurchase plugin = StorekitExternalPurchase();
+        MockStorekitExternalPurchasePlatform fakePlatform = MockStorekitExternalPurchasePlatform();
+        StorekitExternalPurchasePlatform.instance = fakePlatform;
 
-    expect(await storekitExternalPurchasePlugin.getCountryCode(), 'US');
-  });
+        final result = await plugin.getCountryCode();
+        expect(result, 'US');
+        expect(fakePlatform.getCountryCodeCallCount, 1);
+      });
 
-  test('getCountryCode returns null', () async {
-    StorekitExternalPurchase storekitExternalPurchasePlugin = StorekitExternalPurchase();
-    MockStorekitExternalPurchasePlatformNull fakePlatform = MockStorekitExternalPurchasePlatformNull();
-    StorekitExternalPurchasePlatform.instance = fakePlatform;
+      test('returns null when not available', () async {
+        StorekitExternalPurchase plugin = StorekitExternalPurchase();
+        MockStorekitExternalPurchasePlatformNull fakePlatform = MockStorekitExternalPurchasePlatformNull();
+        StorekitExternalPurchasePlatform.instance = fakePlatform;
 
-    expect(await storekitExternalPurchasePlugin.getCountryCode(), null);
+        final result = await plugin.getCountryCode();
+        expect(result, null);
+      });
+    });
+
+    group('isExternalPurchaseAvailable', () {
+      test('returns true when available', () async {
+        StorekitExternalPurchase plugin = StorekitExternalPurchase();
+        MockStorekitExternalPurchasePlatform fakePlatform = MockStorekitExternalPurchasePlatform();
+        StorekitExternalPurchasePlatform.instance = fakePlatform;
+
+        final result = await plugin.isExternalPurchaseAvailable();
+        expect(result, true);
+        expect(fakePlatform.isExternalPurchaseAvailableCallCount, 1);
+      });
+    });
+
+    group('canMakePayments', () {
+      test('returns true when payments can be made', () async {
+        StorekitExternalPurchase plugin = StorekitExternalPurchase();
+        MockStorekitExternalPurchasePlatform fakePlatform = MockStorekitExternalPurchasePlatform();
+        StorekitExternalPurchasePlatform.instance = fakePlatform;
+
+        final result = await plugin.canMakePayments();
+        expect(result, true);
+        expect(fakePlatform.canMakePaymentsCallCount, 1);
+      });
+    });
+
+    group('showNotice', () {
+      test('returns cancelled when user cancels', () async {
+        StorekitExternalPurchase plugin = StorekitExternalPurchase();
+        MockStorekitExternalPurchasePlatformNull fakePlatform = MockStorekitExternalPurchasePlatformNull();
+        StorekitExternalPurchasePlatform.instance = fakePlatform;
+
+        final result = await plugin.showNotice(NoticeType.browser);
+        expect(result, NoticeResult.cancelled);
+      });
+    });
+
+    tearDown(() {
+      StorekitExternalPurchasePlatform.instance = initialPlatform;
+    });
   });
 }

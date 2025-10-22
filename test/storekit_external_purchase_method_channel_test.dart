@@ -21,59 +21,127 @@ void main() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, null);
   });
 
-  test('getCountryCode returns value', () async {
-    expect(await platform.getCountryCode(), '42');
-  });
+  group('MethodChannelStorekitExternalPurchase', () {
+    group('getCountryCode', () {
+      test('returns value when available', () async {
+        expect(await platform.getCountryCode(), '42');
+      });
 
-  test('getCountryCode returns null', () async {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
-      MethodCall methodCall,
-    ) async {
-      return null;
+      test('handles method channel exceptions', () async {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+          MethodCall methodCall,
+        ) async {
+          throw PlatformException(code: 'UNAVAILABLE', message: 'Feature not available');
+        });
+
+        expect(() => platform.getCountryCode(), throwsA(isInstanceOf<PlatformException>()));
+      });
     });
 
-    expect(await platform.getCountryCode(), null);
-  });
+    group('isExternalPurchaseAvailable', () {
+      test('returns true when available', () async {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+          MethodCall methodCall,
+        ) async {
+          return true;
+        });
 
-  test('isExternalPurchaseAvailable returns true', () async {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
-      MethodCall methodCall,
-    ) async {
-      return true;
+        expect(await platform.isExternalPurchaseAvailable(), true);
+      });
+
+      test('returns false when native returns null', () async {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+          MethodCall methodCall,
+        ) async {
+          return null;
+        });
+
+        expect(await platform.isExternalPurchaseAvailable(), false);
+      });
+
+      test('handles method channel exceptions', () async {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+          MethodCall methodCall,
+        ) async {
+          throw PlatformException(code: 'ERROR', message: 'An error occurred');
+        });
+
+        expect(() => platform.isExternalPurchaseAvailable(), throwsA(isInstanceOf<PlatformException>()));
+      });
     });
 
-    expect(await platform.isExternalPurchaseAvailable(), true);
-  });
+    group('showNotice', () {
+      test('returns continued when shown', () async {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+          MethodCall methodCall,
+        ) async {
+          return 'continued';
+        });
 
-  test('isExternalPurchaseAvailable returns false by default', () async {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
-      MethodCall methodCall,
-    ) async {
-      return null;
+        final result = await platform.showNotice(NoticeType.browser);
+        expect(result, NoticeResult.continued);
+      });
+
+      test('returns cancelled by default', () async {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+          MethodCall methodCall,
+        ) async {
+          return null;
+        });
+
+        final result = await platform.showNotice(NoticeType.browser);
+        expect(result, NoticeResult.cancelled);
+      });
+
+      test('passes browser notice type correctly', () async {
+        int? passedNoticeType;
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+          MethodCall methodCall,
+        ) async {
+          if (methodCall.method == 'showNotice') {
+            passedNoticeType = methodCall.arguments['noticeType'] as int?;
+          }
+          return 'continued';
+        });
+
+        await platform.showNotice(NoticeType.browser);
+        expect(passedNoticeType, NoticeType.browser.value);
+      });
+
+      test('handles method channel exceptions', () async {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+          MethodCall methodCall,
+        ) async {
+          throw PlatformException(code: 'ERROR', message: 'Failed to show notice');
+        });
+
+        expect(() => platform.showNotice(NoticeType.browser), throwsA(isInstanceOf<PlatformException>()));
+      });
     });
 
-    expect(await platform.isExternalPurchaseAvailable(), false);
-  });
+    group('Concurrent Operations', () {
+      test('handles mixed concurrent calls', () async {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+          MethodCall methodCall,
+        ) async {
+          await Future.delayed(const Duration(milliseconds: 10));
+          if (methodCall.method == 'getCountryCode') {
+            return 'US';
+          } else if (methodCall.method == 'canMakePayments') {
+            return true;
+          } else if (methodCall.method == 'isExternalPurchaseAvailable') {
+            return true;
+          }
+          return null;
+        });
 
-  test('showNotice returns continued', () async {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
-      MethodCall methodCall,
-    ) async {
-      return 'continued';
+        final futures = [platform.getCountryCode(), platform.canMakePayments(), platform.isExternalPurchaseAvailable()];
+
+        final results = await Future.wait(futures);
+        expect(results[0], 'US');
+        expect(results[1], true);
+        expect(results[2], true);
+      });
     });
-
-    final result = await platform.showNotice(NoticeType.browser);
-    expect(result, NoticeResult.continued);
-  });
-
-  test('showNotice returns cancelled by default', () async {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
-      MethodCall methodCall,
-    ) async {
-      return null;
-    });
-
-    final result = await platform.showNotice(NoticeType.browser);
-    expect(result, NoticeResult.cancelled);
   });
 }

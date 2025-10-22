@@ -1,5 +1,5 @@
 name: storekit_external_purchase
-description: "A new Flutter plugin project."
+description: "Flutter plugin to use StoreKit External Purchase (custom link) APIs on Apple platforms. Provides eligibility check, capability check, and notice presentation. iOS only."
 version: 0.0.1
 homepage: 
 
