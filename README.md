@@ -84,6 +84,3 @@ Future<void> attemptExternalPurchase() async {
 - Ensure your app distribution targets EU storefronts and meets Apple’s policy requirements. For details on communication and promotion of offers on the App Store in the EU, see [Apple's support page](https://developer.apple.com/support/communication-and-promotion-of-offers-on-the-app-store-in-the-eu/).
 - Wrap calls with platform/version checks as needed if you support older iOS versions.
 
-## License
-See `LICENSE` for details.
-
