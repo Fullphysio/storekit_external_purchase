@@ -12,8 +12,7 @@ class MockStorekitExternalPurchasePlatform with MockPlatformInterfaceMixin imple
   Future<bool> isExternalPurchaseAvailable() => Future.value(true);
 
   @override
-  Future<ExternalPurchaseResult> presentExternalPurchase(String destinationUrl) =>
-      Future.value(ExternalPurchaseResult(accepted: true));
+  Future<NoticeResult> showNotice(NoticeType noticeType) => Future.value(NoticeResult.continued);
 }
 
 class MockStorekitExternalPurchasePlatformNull
@@ -26,8 +25,7 @@ class MockStorekitExternalPurchasePlatformNull
   Future<bool> isExternalPurchaseAvailable() => Future.value(false);
 
   @override
-  Future<ExternalPurchaseResult> presentExternalPurchase(String destinationUrl) =>
-      Future.value(ExternalPurchaseResult(accepted: false));
+  Future<NoticeResult> showNotice(NoticeType noticeType) => Future.value(NoticeResult.cancelled);
 }
 
 void main() {

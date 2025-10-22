@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:storekit_external_purchase/storekit_external_purchase_method_channel.dart';
+import 'package:storekit_external_purchase/storekit_external_purchase_platform_interface.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -54,25 +55,25 @@ void main() {
     expect(await platform.isExternalPurchaseAvailable(), false);
   });
 
-  test('presentExternalPurchase returns accepted true', () async {
+  test('showNotice returns continued', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
       MethodCall methodCall,
     ) async {
-      return {'accepted': true};
+      return 'continued';
     });
 
-    final result = await platform.presentExternalPurchase('https://example.com');
-    expect(result.accepted, true);
+    final result = await platform.showNotice(NoticeType.browser);
+    expect(result, NoticeResult.continued);
   });
 
-  test('presentExternalPurchase returns accepted false by default', () async {
+  test('showNotice returns cancelled by default', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
       MethodCall methodCall,
     ) async {
       return null;
     });
 
-    final result = await platform.presentExternalPurchase('https://example.com');
-    expect(result.accepted, false);
+    final result = await platform.showNotice(NoticeType.browser);
+    expect(result, NoticeResult.cancelled);
   });
 }

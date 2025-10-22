@@ -2,14 +2,29 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'storekit_external_purchase_method_channel.dart';
 
-class ExternalPurchaseResult {
-  ExternalPurchaseResult({required this.accepted, this.token});
+enum NoticeType {
+  browser(0),
+  withinApp(1);
 
-  final bool accepted;
-  final String? token;
+  const NoticeType(this.value);
 
-  factory ExternalPurchaseResult.fromMap(Map<Object?, Object?> map) {
-    return ExternalPurchaseResult(accepted: (map['accepted'] as bool?) ?? false, token: map['token'] as String?);
+  final int value;
+}
+
+enum NoticeResult {
+  continued("continued"),
+  cancelled("cancelled");
+
+  const NoticeResult(this.value);
+
+  final String value;
+
+  static NoticeResult fromValue(String value) {
+    try {
+      return NoticeResult.values.firstWhere((e) => e.value == value);
+    } catch (_) {
+      throw ArgumentError('Invalid notice result: $value');
+    }
   }
 }
 
@@ -42,7 +57,11 @@ abstract class StorekitExternalPurchasePlatform extends PlatformInterface {
     throw UnimplementedError('isExternalPurchaseAvailable() has not been implemented.');
   }
 
-  Future<ExternalPurchaseResult> presentExternalPurchase(String destinationUrl) {
-    throw UnimplementedError('presentExternalPurchase() has not been implemented.');
+  Future<bool> canMakePayments() {
+    throw UnimplementedError('canMakePayments() has not been implemented.');
+  }
+
+  Future<NoticeResult> showNotice(NoticeType noticeType) {
+    throw UnimplementedError('showNotice() has not been implemented.');
   }
 }

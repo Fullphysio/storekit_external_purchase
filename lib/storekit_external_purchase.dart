@@ -9,7 +9,11 @@ class StorekitExternalPurchase {
     return StorekitExternalPurchasePlatform.instance.isExternalPurchaseAvailable();
   }
 
-  Future<ExternalPurchaseResult> presentExternalPurchase(String destinationUrl) {
-    return StorekitExternalPurchasePlatform.instance.presentExternalPurchase(destinationUrl);
+  Future<bool> canMakePayments() {
+    return StorekitExternalPurchasePlatform.instance.canMakePayments();
+  }
+
+  Future<NoticeResult> showNotice(NoticeType noticeType) {
+    return StorekitExternalPurchasePlatform.instance.showNotice(noticeType);
   }
 }

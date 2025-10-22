@@ -22,10 +22,14 @@ class MethodChannelStorekitExternalPurchase extends StorekitExternalPurchasePlat
   }
 
   @override
-  Future<ExternalPurchaseResult> presentExternalPurchase(String destinationUrl) async {
-    final resultMap = await methodChannel.invokeMethod<Map<Object?, Object?>>('presentExternalPurchase', {
-      'destinationUrl': destinationUrl,
-    });
-    return ExternalPurchaseResult.fromMap(resultMap ?? const {'accepted': false});
+  Future<bool> canMakePayments() async {
+    final result = await methodChannel.invokeMethod<bool>('canMakePayments');
+    return result ?? false;
+  }
+
+  @override
+  Future<NoticeResult> showNotice(NoticeType noticeType) async {
+    final resultString = await methodChannel.invokeMethod<String>('showNotice', {'noticeType': noticeType.value});
+    return NoticeResult.fromValue(resultString ?? 'cancelled');
   }
 }

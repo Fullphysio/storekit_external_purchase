@@ -12,38 +12,72 @@ public class StorekitExternalPurchasePlugin: NSObject, FlutterPlugin {
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     switch call.method {
     case "getCountryCode":
-      Task {
-        do {
-          let storefront = try await Storefront.current
-          result(storefront?.countryCode)
-        } catch {
-          result(nil)
+      if #available(iOS 15.0, *) {
+        Task {
+          do {
+            let storefront = try await Storefront.current
+            result(storefront?.countryCode)
+          } catch {
+            result(nil)
+          }
         }
+      } else {
+        result(nil)
       }
-    case "isExternalPurchaseAvailable":
-      if #available(iOS 17.4, *) {
-        result(true)
+    case "isEligible":
+      if #available(iOS 18.1, *) {
+        Task {
+          let eligible = await ExternalPurchaseCustomLink.isEligible
+          result(eligible)
+        }
       } else {
         result(false)
       }
-    case "presentExternalPurchase":
-      guard let args = call.arguments as? [String: Any],
-            let destinationUrl = args["destinationUrl"] as? String,
-            let url = URL(string: destinationUrl) else {
-        result(["accepted": false])
-        return
+    case "canMakePayments":
+      if #available(iOS 15.0, *) {
+        result(AppStore.canMakePayments)
+      } else {
+        result(false)
       }
-
-      if #available(iOS 17.4, *) {
-        // Present Apple system disclosure and open Safari
-        // NOTE: Apple provides system UI via StoreKit External Purchase APIs.
-        // Here we open Safari after the disclosure. The disclosure presentation
-        // is handled by system when using the entitlement and approved flows.
-        UIApplication.shared.open(url, options: [:]) { opened in
-          result(["accepted": opened])
+    case "showNotice":
+      if #available(iOS 18.1, *) {
+        guard let args = call.arguments as? [String: Any],
+              let noticeTypeString = args["noticeType"] as? Int,
+              let noticeType = ExternalPurchaseCustomLink.NoticeType(rawValue: noticeTypeString) else {
+          result(FlutterError(
+            code: "INVALID_ARGUMENTS",
+            message: "Invalid arguments",
+            details: ["noticeType": call.arguments]
+          ))
+          return
+        }
+        Task {
+          do {
+            let purchaseResult = try await ExternalPurchaseCustomLink.showNotice(type: noticeType)
+            var resultString: String
+            switch purchaseResult {
+            case .continued:
+                resultString = "continued"
+            case .cancelled:
+                resultString = "cancelled"
+            @unknown default:
+                resultString = "error"
+            }
+            result(resultString)
+          } catch {
+            result(FlutterError(
+              code: "SHOW_NOTICE_FAILED",
+              message: "Failed to show external purchase notice",
+              details: error.localizedDescription
+            ))
+          }
         }
       } else {
-        result(["accepted": false])
+        result(FlutterError(
+            code: "UNSUPPORTED_API",
+            message: "The requested feature is not supported on this version of iOS.",
+            details: ["min_version": "iOS 18.1"]
+        ))
       }
     default:
       result(FlutterMethodNotImplemented)
