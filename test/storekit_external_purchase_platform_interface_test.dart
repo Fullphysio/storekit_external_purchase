@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:storekit_external_purchase/storekit_external_purchase_platform_interface.dart';
 import 'package:storekit_external_purchase/storekit_external_purchase_method_channel.dart';
-import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 class MockPlatformImplementation extends StorekitExternalPurchasePlatform {
   @override
