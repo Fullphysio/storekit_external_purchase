@@ -3,7 +3,6 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:storekit_external_purchase/storekit_external_purchase.dart';
-import 'package:storekit_external_purchase/storekit_external_purchase_platform_interface.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,7 +19,7 @@ class _MyAppState extends State<MyApp> {
   final _plugin = StorekitExternalPurchase();
 
   String _countryCode = 'Unknown';
-  bool _isExternalPurchaseAvailable = false;
+  bool _isEligible = false;
   String _externalPurchaseResult = 'Not attempted';
   bool _isLoading = false;
 
@@ -33,19 +32,19 @@ class _MyAppState extends State<MyApp> {
   Future<void> _initializePlatformState() async {
     try {
       final countryCode = await _plugin.getCountryCode() ?? 'Unknown';
-      final isAvailable = await _plugin.isExternalPurchaseAvailable();
+      final isEligible = await _plugin.isEligible();
 
       if (!mounted) return;
 
       setState(() {
         _countryCode = countryCode;
-        _isExternalPurchaseAvailable = isAvailable;
+        _isEligible = isEligible;
       });
     } on PlatformException {
       if (!mounted) return;
       setState(() {
         _countryCode = 'Failed to get country code';
-        _isExternalPurchaseAvailable = false;
+        _isEligible = false;
       });
     }
   }
@@ -87,8 +86,8 @@ class _MyAppState extends State<MyApp> {
               ),
               const SizedBox(height: 24),
               _buildSection(
-                title: 'isExternalPurchaseAvailable()',
-                child: Text('Available: $_isExternalPurchaseAvailable', style: const TextStyle(fontSize: 16)),
+                title: 'isEligible()',
+                child: Text('Eligible: $_isEligible', style: const TextStyle(fontSize: 16)),
               ),
               const SizedBox(height: 24),
               _buildSection(
