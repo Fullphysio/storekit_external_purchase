@@ -6,7 +6,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 class MockStorekitExternalPurchasePlatform with MockPlatformInterfaceMixin implements StorekitExternalPurchasePlatform {
   int getCountryCodeCallCount = 0;
-  int isExternalPurchaseAvailableCallCount = 0;
+  int isEligibleCallCount = 0;
   int canMakePaymentsCallCount = 0;
   int showNoticeCallCount = 0;
   int tokenCallCount = 0;
@@ -18,8 +18,8 @@ class MockStorekitExternalPurchasePlatform with MockPlatformInterfaceMixin imple
   }
 
   @override
-  Future<bool> isExternalPurchaseAvailable() async {
-    isExternalPurchaseAvailableCallCount++;
+  Future<bool> isEligible() async {
+    isEligibleCallCount++;
     return true;
   }
 
@@ -49,7 +49,7 @@ class MockStorekitExternalPurchasePlatformNull
   Future<String?> getCountryCode() => Future.value(null);
 
   @override
-  Future<bool> isExternalPurchaseAvailable() => Future.value(false);
+  Future<bool> isEligible() => Future.value(false);
 
   @override
   Future<bool> canMakePayments() => Future.value(false);
@@ -90,15 +90,15 @@ void main() {
       });
     });
 
-    group('isExternalPurchaseAvailable', () {
+    group('isEligible', () {
       test('returns true when available', () async {
         StorekitExternalPurchase plugin = StorekitExternalPurchase();
         MockStorekitExternalPurchasePlatform fakePlatform = MockStorekitExternalPurchasePlatform();
         StorekitExternalPurchasePlatform.instance = fakePlatform;
 
-        final result = await plugin.isExternalPurchaseAvailable();
+        final result = await plugin.isEligible();
         expect(result, true);
-        expect(fakePlatform.isExternalPurchaseAvailableCallCount, 1);
+        expect(fakePlatform.isEligibleCallCount, 1);
       });
     });
 

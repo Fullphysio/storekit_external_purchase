@@ -7,7 +7,7 @@ class MockPlatformImplementation extends StorekitExternalPurchasePlatform {
   Future<String?> getCountryCode() => Future.value('US');
 
   @override
-  Future<bool> isExternalPurchaseAvailable() => Future.value(true);
+  Future<bool> isEligible() => Future.value(true);
 
   @override
   Future<bool> canMakePayments() => Future.value(true);

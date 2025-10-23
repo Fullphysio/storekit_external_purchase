@@ -38,7 +38,7 @@ void main() {
       });
     });
 
-    group('isExternalPurchaseAvailable', () {
+    group('isEligible', () {
       test('returns true when available', () async {
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
           MethodCall methodCall,
@@ -46,7 +46,7 @@ void main() {
           return true;
         });
 
-        expect(await platform.isExternalPurchaseAvailable(), true);
+        expect(await platform.isEligible(), true);
       });
 
       test('returns false when native returns null', () async {
@@ -56,7 +56,7 @@ void main() {
           return null;
         });
 
-        expect(await platform.isExternalPurchaseAvailable(), false);
+        expect(await platform.isEligible(), false);
       });
 
       test('handles method channel exceptions', () async {
@@ -66,7 +66,7 @@ void main() {
           throw PlatformException(code: 'ERROR', message: 'An error occurred');
         });
 
-        expect(() => platform.isExternalPurchaseAvailable(), throwsA(isInstanceOf<PlatformException>()));
+        expect(() => platform.isEligible(), throwsA(isInstanceOf<PlatformException>()));
       });
     });
 
@@ -194,13 +194,13 @@ void main() {
             return 'US';
           } else if (methodCall.method == 'canMakePayments') {
             return true;
-          } else if (methodCall.method == 'isExternalPurchaseAvailable') {
+          } else if (methodCall.method == 'isEligible') {
             return true;
           }
           return null;
         });
 
-        final futures = [platform.getCountryCode(), platform.canMakePayments(), platform.isExternalPurchaseAvailable()];
+        final futures = [platform.getCountryCode(), platform.canMakePayments(), platform.isEligible()];
 
         final results = await Future.wait(futures);
         expect(results[0], 'US');
