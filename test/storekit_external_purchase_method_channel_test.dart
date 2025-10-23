@@ -119,6 +119,71 @@ void main() {
       });
     });
 
+    group('token', () {
+      test('returns token when available', () async {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+          MethodCall methodCall,
+        ) async {
+          return 'token-data';
+        });
+
+        final result = await platform.token(TokenType.acquisition);
+        expect(result, isNotNull);
+        expect(result!.value, 'token-data');
+      });
+
+      test('returns null when native returns null', () async {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+          MethodCall methodCall,
+        ) async {
+          return null;
+        });
+
+        final result = await platform.token(TokenType.acquisition);
+        expect(result, isNull);
+      });
+
+      test('passes acquisition token type correctly', () async {
+        String? passedTokenType;
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+          MethodCall methodCall,
+        ) async {
+          if (methodCall.method == 'token') {
+            passedTokenType = methodCall.arguments['tokenType'] as String?;
+          }
+          return 'token-data';
+        });
+
+        await platform.token(TokenType.acquisition);
+        expect(passedTokenType, TokenType.acquisition.value);
+      });
+
+      test('passes services token type correctly', () async {
+        String? passedTokenType;
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+          MethodCall methodCall,
+        ) async {
+          if (methodCall.method == 'token') {
+            passedTokenType = methodCall.arguments['tokenType'] as String?;
+          }
+          return 'token-data';
+        });
+
+        await platform.token(TokenType.services);
+        expect(passedTokenType, TokenType.services.value);
+      });
+
+      test('handles method channel exceptions', () async {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+          MethodCall methodCall,
+        ) async {
+          throw PlatformException(code: 'ERROR', message: 'Failed to get token');
+        });
+
+        expect(() => platform.token(TokenType.acquisition), throwsA(isInstanceOf<PlatformException>()));
+      });
+    });
+
     group('Concurrent Operations', () {
       test('handles mixed concurrent calls', () async {
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (

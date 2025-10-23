@@ -75,6 +75,40 @@ public class StorekitExternalPurchasePlugin: NSObject, FlutterPlugin {
             details: ["min_version": "iOS 18.1"]
         ))
       }
+    case "token":
+      if #available(iOS 18.1, *) {
+        guard let args = call.arguments as? [String: Any],
+              let tokenTypeString = args["tokenType"] as? String else {
+          result(FlutterError(
+            code: "INVALID_ARGUMENTS",
+            message: "Invalid arguments",
+            details: ["tokenType": call.arguments]
+          ))
+          return
+        }
+        Task {
+          do {
+            let token = try await ExternalPurchaseCustomLink.token(for: tokenTypeString)
+            if let token = token {
+              result(token.value)
+            } else {
+              result(nil)
+            }
+          } catch {
+            result(FlutterError(
+              code: "TOKEN_REQUEST_FAILED",
+              message: "Failed to request external purchase token",
+              details: error.localizedDescription
+            ))
+          }
+        }
+      } else {
+        result(FlutterError(
+          code: "UNSUPPORTED_API",
+          message: "The requested feature is not supported on this version of iOS.",
+          details: ["min_version": "iOS 18.1"]
+        ))
+      }
     default:
       result(FlutterMethodNotImplemented)
     }

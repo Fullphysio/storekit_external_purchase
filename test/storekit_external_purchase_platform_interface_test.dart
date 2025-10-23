@@ -14,6 +14,9 @@ class MockPlatformImplementation extends StorekitExternalPurchasePlatform {
 
   @override
   Future<NoticeResult> showNotice(NoticeType noticeType) => Future.value(NoticeResult.continued);
+
+  @override
+  Future<Token?> token(TokenType tokenType) => Future.value(Token('mock-token-data'));
 }
 
 void main() {
@@ -24,6 +27,44 @@ void main() {
 
     test('withinApp has correct value', () {
       expect(NoticeType.withinApp.value, 1);
+    });
+  });
+
+  group('TokenType Enum', () {
+    test('acquisition has correct value', () {
+      expect(TokenType.acquisition.value, 'ACQUISITION');
+    });
+
+    test('services has correct value', () {
+      expect(TokenType.services.value, 'SERVICES');
+    });
+  });
+
+  group('Token Class', () {
+    test('constructor sets data correctly', () {
+      const token = Token('test-data');
+      expect(token.value, 'test-data');
+    });
+
+    test('toString returns correct format', () {
+      const token = Token('test-data');
+      expect(token.toString(), 'Token(data: test-data)');
+    });
+
+    test('equality works correctly', () {
+      const token1 = Token('data');
+      const token2 = Token('data');
+      const token3 = Token('different');
+
+      expect(token1, equals(token2));
+      expect(token1, isNot(equals(token3)));
+    });
+
+    test('hashCode is consistent', () {
+      const token1 = Token('data');
+      const token2 = Token('data');
+
+      expect(token1.hashCode, equals(token2.hashCode));
     });
   });
 

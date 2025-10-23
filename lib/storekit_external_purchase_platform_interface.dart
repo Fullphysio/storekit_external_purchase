@@ -11,6 +11,15 @@ enum NoticeType {
   final int value;
 }
 
+enum TokenType {
+  acquisition('ACQUISITION'),
+  services('SERVICES');
+
+  const TokenType(this.value);
+
+  final String value;
+}
+
 enum NoticeResult {
   continued("continued"),
   cancelled("cancelled");
@@ -26,6 +35,23 @@ enum NoticeResult {
       throw ArgumentError('Invalid notice result: $value');
     }
   }
+}
+
+class Token {
+  /// The token data as returned from StoreKit
+  final String value;
+
+  const Token(this.value);
+
+  @override
+  String toString() => 'Token(data: $value)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is Token && runtimeType == other.runtimeType && value == other.value;
+
+  @override
+  int get hashCode => value.hashCode;
 }
 
 abstract class StorekitExternalPurchasePlatform extends PlatformInterface {
@@ -53,8 +79,8 @@ abstract class StorekitExternalPurchasePlatform extends PlatformInterface {
     throw UnimplementedError('getCountryCode() has not been implemented.');
   }
 
-  Future<bool> isExternalPurchaseAvailable() {
-    throw UnimplementedError('isExternalPurchaseAvailable() has not been implemented.');
+  Future<bool> isEligible() {
+    throw UnimplementedError('isEligible() has not been implemented.');
   }
 
   Future<bool> canMakePayments() {
@@ -63,5 +89,9 @@ abstract class StorekitExternalPurchasePlatform extends PlatformInterface {
 
   Future<NoticeResult> showNotice(NoticeType noticeType) {
     throw UnimplementedError('showNotice() has not been implemented.');
+  }
+
+  Future<Token?> token(TokenType tokenType) {
+    throw UnimplementedError('token() has not been implemented.');
   }
 }

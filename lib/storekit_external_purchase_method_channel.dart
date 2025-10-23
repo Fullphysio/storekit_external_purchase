@@ -16,8 +16,8 @@ class MethodChannelStorekitExternalPurchase extends StorekitExternalPurchasePlat
   }
 
   @override
-  Future<bool> isExternalPurchaseAvailable() async {
-    final available = await methodChannel.invokeMethod<bool>('isExternalPurchaseAvailable');
+  Future<bool> isEligible() async {
+    final available = await methodChannel.invokeMethod<bool>('isEligible');
     return available ?? false;
   }
 
@@ -31,5 +31,11 @@ class MethodChannelStorekitExternalPurchase extends StorekitExternalPurchasePlat
   Future<NoticeResult> showNotice(NoticeType noticeType) async {
     final resultString = await methodChannel.invokeMethod<String>('showNotice', {'noticeType': noticeType.value});
     return NoticeResult.fromValue(resultString ?? 'cancelled');
+  }
+
+  @override
+  Future<Token?> token(TokenType tokenType) async {
+    final result = await methodChannel.invokeMethod<String>('token', {'tokenType': tokenType.value});
+    return result != null ? Token(result) : null;
   }
 }

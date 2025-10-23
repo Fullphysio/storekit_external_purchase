@@ -9,6 +9,7 @@ class MockStorekitExternalPurchasePlatform with MockPlatformInterfaceMixin imple
   int isExternalPurchaseAvailableCallCount = 0;
   int canMakePaymentsCallCount = 0;
   int showNoticeCallCount = 0;
+  int tokenCallCount = 0;
 
   @override
   Future<String?> getCountryCode() async {
@@ -33,6 +34,12 @@ class MockStorekitExternalPurchasePlatform with MockPlatformInterfaceMixin imple
     showNoticeCallCount++;
     return NoticeResult.continued;
   }
+
+  @override
+  Future<Token?> token(TokenType tokenType) async {
+    tokenCallCount++;
+    return Token('mock-token');
+  }
 }
 
 class MockStorekitExternalPurchasePlatformNull
@@ -49,6 +56,9 @@ class MockStorekitExternalPurchasePlatformNull
 
   @override
   Future<NoticeResult> showNotice(NoticeType noticeType) => Future.value(NoticeResult.cancelled);
+
+  @override
+  Future<Token?> token(TokenType tokenType) => Future.value(null);
 }
 
 void main() {
@@ -112,6 +122,28 @@ void main() {
 
         final result = await plugin.showNotice(NoticeType.browser);
         expect(result, NoticeResult.cancelled);
+      });
+    });
+
+    group('token', () {
+      test('returns token when available', () async {
+        StorekitExternalPurchase plugin = StorekitExternalPurchase();
+        MockStorekitExternalPurchasePlatform fakePlatform = MockStorekitExternalPurchasePlatform();
+        StorekitExternalPurchasePlatform.instance = fakePlatform;
+
+        final result = await plugin.token(TokenType.acquisition);
+        expect(result, isNotNull);
+        expect(result!.value, 'mock-token');
+        expect(fakePlatform.tokenCallCount, 1);
+      });
+
+      test('returns null when not available', () async {
+        StorekitExternalPurchase plugin = StorekitExternalPurchase();
+        MockStorekitExternalPurchasePlatformNull fakePlatform = MockStorekitExternalPurchasePlatformNull();
+        StorekitExternalPurchasePlatform.instance = fakePlatform;
+
+        final result = await plugin.token(TokenType.acquisition);
+        expect(result, null);
       });
     });
 
