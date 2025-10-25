@@ -27,13 +27,21 @@ public class StorekitExternalPurchasePlugin: NSObject, FlutterPlugin {
           result(eligible)
         }
       } else {
-        result(false)
+        result(FlutterError(
+          code: "UNSUPPORTED_API",
+          message: "The requested feature is not supported on this version of iOS.",
+          details: ["min_version": "iOS 18.1"]
+        ))
       }
     case "canMakePayments":
       if #available(iOS 15.0, *) {
         result(AppStore.canMakePayments)
       } else {
-        result(false)
+        result(FlutterError(
+          code: "UNSUPPORTED_API",
+          message: "The requested feature is not supported on this version of iOS.",
+          details: ["min_version": "iOS 15.0"]
+        ))
       }
     case "showNotice":
       if #available(iOS 18.1, *) {
