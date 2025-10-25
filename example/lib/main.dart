@@ -30,57 +30,35 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _initializePlatformState() async {
-    try {
-      final countryCode = await _plugin.getCountryCode() ?? 'Unknown';
-      final isEligible = await _plugin.isEligible();
+    final countryCode = await _plugin.getCountryCode() ?? 'Unknown';
+    final isEligible = await _plugin.isEligible();
 
-      if (!mounted) return;
+    if (!mounted) return;
 
-      setState(() {
-        _countryCode = countryCode;
-        _isEligible = isEligible;
-      });
-    } on PlatformException {
-      if (!mounted) return;
-      setState(() {
-        _countryCode = 'Failed to get country code';
-        _isEligible = false;
-      });
-    }
+    setState(() {
+      _countryCode = countryCode;
+      _isEligible = isEligible;
+    });
   }
 
   Future<void> _refreshCountryCode() async {
-    try {
-      final countryCode = await _plugin.getCountryCode() ?? 'Unknown';
+    final countryCode = await _plugin.getCountryCode() ?? 'Unknown';
 
-      if (!mounted) return;
+    if (!mounted) return;
 
-      setState(() {
-        _countryCode = countryCode;
-      });
-    } on PlatformException {
-      if (!mounted) return;
-      setState(() {
-        _countryCode = 'Failed to get country code';
-      });
-    }
+    setState(() {
+      _countryCode = countryCode;
+    });
   }
 
   Future<void> _refreshEligibility() async {
-    try {
-      final isEligible = await _plugin.isEligible();
+    final isEligible = await _plugin.isEligible();
 
-      if (!mounted) return;
+    if (!mounted) return;
 
-      setState(() {
-        _isEligible = isEligible;
-      });
-    } on PlatformException {
-      if (!mounted) return;
-      setState(() {
-        _isEligible = false;
-      });
-    }
+    setState(() {
+      _isEligible = isEligible;
+    });
   }
 
   Future<void> _handlePresentExternalPurchase() async {
