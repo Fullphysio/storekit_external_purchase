@@ -49,6 +49,40 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  Future<void> _refreshCountryCode() async {
+    try {
+      final countryCode = await _plugin.getCountryCode() ?? 'Unknown';
+
+      if (!mounted) return;
+
+      setState(() {
+        _countryCode = countryCode;
+      });
+    } on PlatformException {
+      if (!mounted) return;
+      setState(() {
+        _countryCode = 'Failed to get country code';
+      });
+    }
+  }
+
+  Future<void> _refreshEligibility() async {
+    try {
+      final isEligible = await _plugin.isEligible();
+
+      if (!mounted) return;
+
+      setState(() {
+        _isEligible = isEligible;
+      });
+    } on PlatformException {
+      if (!mounted) return;
+      setState(() {
+        _isEligible = false;
+      });
+    }
+  }
+
   Future<void> _handlePresentExternalPurchase() async {
     setState(() => _isLoading = true);
 
@@ -82,11 +116,13 @@ class _MyAppState extends State<MyApp> {
             children: [
               _buildSection(
                 title: 'getCountryCode()',
+                onTap: _refreshCountryCode,
                 child: Text('Country Code: $_countryCode', style: const TextStyle(fontSize: 16)),
               ),
               const SizedBox(height: 24),
               _buildSection(
                 title: 'isEligible()',
+                onTap: _refreshEligibility,
                 child: Text('Eligible: $_isEligible', style: const TextStyle(fontSize: 16)),
               ),
               const SizedBox(height: 24),
@@ -113,20 +149,22 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Widget _buildSection({required String title, required Widget child}) {
+  Widget _buildSection({required String title, required Widget child, VoidCallback? onTap}) {
+    final card = Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: child,
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: child,
-        ),
+        if (onTap != null) InkWell(onTap: onTap, child: card) else card,
       ],
     );
   }
