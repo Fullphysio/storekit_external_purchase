@@ -14,8 +14,8 @@ public class StorekitExternalPurchasePlugin: NSObject, FlutterPlugin {
     case "getCountryCode":
       if #available(iOS 15.0, *) {
         Task {
-            let storefront = await Storefront.current
-            result(storefront?.countryCode)
+          let storefront = await Storefront.current
+          result(storefront?.countryCode)
         }
       } else {
         result(nil)
