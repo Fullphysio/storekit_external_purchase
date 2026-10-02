@@ -13,10 +13,12 @@ class MockPlatformImplementation extends StorekitExternalPurchasePlatform {
   Future<bool> canMakePayments() => Future.value(true);
 
   @override
-  Future<NoticeResult> showNotice(NoticeType noticeType) => Future.value(NoticeResult.continued);
+  Future<NoticeResult> showNotice(NoticeType noticeType) =>
+      Future.value(NoticeResult.continued);
 
   @override
-  Future<Token?> token(TokenType tokenType) => Future.value(Token('mock-token-data'));
+  Future<Token?> token(TokenType tokenType) =>
+      Future.value(Token('mock-token-data'));
 }
 
 void main() {
@@ -80,16 +82,23 @@ void main() {
       });
 
       test('throws ArgumentError for invalid value', () {
-        expect(() => NoticeResult.fromValue('invalid'), throwsA(isInstanceOf<ArgumentError>()));
+        expect(
+          () => NoticeResult.fromValue('invalid'),
+          throwsA(isInstanceOf<ArgumentError>()),
+        );
       });
     });
   });
 
   group('StorekitExternalPurchasePlatform Interface', () {
-    final StorekitExternalPurchasePlatform initialPlatform = StorekitExternalPurchasePlatform.instance;
+    final StorekitExternalPurchasePlatform initialPlatform =
+        StorekitExternalPurchasePlatform.instance;
 
     test('default instance is MethodChannelStorekitExternalPurchase', () {
-      expect(initialPlatform, isInstanceOf<MethodChannelStorekitExternalPurchase>());
+      expect(
+        initialPlatform,
+        isInstanceOf<MethodChannelStorekitExternalPurchase>(),
+      );
     });
 
     test('can be set to a custom implementation', () {

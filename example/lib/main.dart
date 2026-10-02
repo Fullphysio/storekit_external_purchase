@@ -70,7 +70,8 @@ class _MyAppState extends State<MyApp> {
       if (!mounted) return;
 
       setState(() {
-        _externalPurchaseResult = 'Result: ${result.value}, Accepted: ${result == NoticeResult.continued}';
+        _externalPurchaseResult =
+            'Result: ${result.value}, Accepted: ${result == NoticeResult.continued}';
         _isLoading = false;
       });
     } on PlatformException catch (e) {
@@ -95,13 +96,19 @@ class _MyAppState extends State<MyApp> {
               _buildSection(
                 title: 'getCountryCode()',
                 onTap: _refreshCountryCode,
-                child: Text('Country Code: $_countryCode', style: const TextStyle(fontSize: 16)),
+                child: Text(
+                  'Country Code: $_countryCode',
+                  style: const TextStyle(fontSize: 16),
+                ),
               ),
               const SizedBox(height: 24),
               _buildSection(
                 title: 'isEligible()',
                 onTap: _refreshEligibility,
-                child: Text('Eligible: $_isEligible', style: const TextStyle(fontSize: 16)),
+                child: Text(
+                  'Eligible: $_isEligible',
+                  style: const TextStyle(fontSize: 16),
+                ),
               ),
               const SizedBox(height: 24),
               _buildSection(
@@ -109,12 +116,21 @@ class _MyAppState extends State<MyApp> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Result: $_externalPurchaseResult', style: const TextStyle(fontSize: 16)),
+                    Text(
+                      'Result: $_externalPurchaseResult',
+                      style: const TextStyle(fontSize: 16),
+                    ),
                     const SizedBox(height: 12),
                     ElevatedButton(
-                      onPressed: _isLoading ? null : _handlePresentExternalPurchase,
+                      onPressed: _isLoading
+                          ? null
+                          : _handlePresentExternalPurchase,
                       child: _isLoading
-                          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
                           : const Text('Show Notice'),
                     ),
                   ],
@@ -127,7 +143,11 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Widget _buildSection({required String title, required Widget child, VoidCallback? onTap}) {
+  Widget _buildSection({
+    required String title,
+    required Widget child,
+    VoidCallback? onTap,
+  }) {
     final card = Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -140,7 +160,10 @@ class _MyAppState extends State<MyApp> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 8),
         if (onTap != null) InkWell(onTap: onTap, child: card) else card,
       ],

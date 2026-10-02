@@ -7,25 +7,34 @@ on:
   pull_request:
 
 jobs:
-  build:
+  check:
     name: Analyze and Test
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
         with:
           channel: stable
+      - run: flutter pub get
+      - run: dart format --output=none --set-exit-if-changed .
+      - run: flutter analyze
+      - run: flutter test
+      - run: flutter pub publish --dry-run
 
-      - name: Flutter pub get
-        run: flutter pub get
-
-      - name: Flutter analyze
-        run: flutter analyze
-
-      - name: Flutter test
-        run: flutter test
-
+  build-ios:
+    name: Build example (${{ matrix.integration }})
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        integration: [swift-package-manager, cocoapods]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - if: matrix.integration == 'swift-package-manager'
+        run: flutter config --enable-swift-package-manager
+      - if: matrix.integration == 'cocoapods'
+        run: flutter config --no-enable-swift-package-manager
+      - working-directory: example
+        run: flutter build ios --simulator --debug
