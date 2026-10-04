@@ -4,7 +4,9 @@ import 'package:storekit_external_purchase/storekit_external_purchase_platform_i
 import 'package:storekit_external_purchase/storekit_external_purchase_method_channel.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-class MockStorekitExternalPurchasePlatform with MockPlatformInterfaceMixin implements StorekitExternalPurchasePlatform {
+class MockStorekitExternalPurchasePlatform
+    with MockPlatformInterfaceMixin
+    implements StorekitExternalPurchasePlatform {
   int getCountryCodeCallCount = 0;
   int isEligibleCallCount = 0;
   int canMakePaymentsCallCount = 0;
@@ -55,24 +57,30 @@ class MockStorekitExternalPurchasePlatformNull
   Future<bool> canMakePayments() => Future.value(false);
 
   @override
-  Future<NoticeResult> showNotice(NoticeType noticeType) => Future.value(NoticeResult.cancelled);
+  Future<NoticeResult> showNotice(NoticeType noticeType) =>
+      Future.value(NoticeResult.cancelled);
 
   @override
   Future<Token?> token(TokenType tokenType) => Future.value(null);
 }
 
 void main() {
-  final StorekitExternalPurchasePlatform initialPlatform = StorekitExternalPurchasePlatform.instance;
+  final StorekitExternalPurchasePlatform initialPlatform =
+      StorekitExternalPurchasePlatform.instance;
 
   group('StorekitExternalPurchase Main Plugin Class', () {
     test('$MethodChannelStorekitExternalPurchase is the default instance', () {
-      expect(initialPlatform, isInstanceOf<MethodChannelStorekitExternalPurchase>());
+      expect(
+        initialPlatform,
+        isInstanceOf<MethodChannelStorekitExternalPurchase>(),
+      );
     });
 
     group('getCountryCode', () {
       test('returns value when available', () async {
         StorekitExternalPurchase plugin = StorekitExternalPurchase();
-        MockStorekitExternalPurchasePlatform fakePlatform = MockStorekitExternalPurchasePlatform();
+        MockStorekitExternalPurchasePlatform fakePlatform =
+            MockStorekitExternalPurchasePlatform();
         StorekitExternalPurchasePlatform.instance = fakePlatform;
 
         final result = await plugin.getCountryCode();
@@ -82,7 +90,8 @@ void main() {
 
       test('returns null when not available', () async {
         StorekitExternalPurchase plugin = StorekitExternalPurchase();
-        MockStorekitExternalPurchasePlatformNull fakePlatform = MockStorekitExternalPurchasePlatformNull();
+        MockStorekitExternalPurchasePlatformNull fakePlatform =
+            MockStorekitExternalPurchasePlatformNull();
         StorekitExternalPurchasePlatform.instance = fakePlatform;
 
         final result = await plugin.getCountryCode();
@@ -93,7 +102,8 @@ void main() {
     group('isEligible', () {
       test('returns true when available', () async {
         StorekitExternalPurchase plugin = StorekitExternalPurchase();
-        MockStorekitExternalPurchasePlatform fakePlatform = MockStorekitExternalPurchasePlatform();
+        MockStorekitExternalPurchasePlatform fakePlatform =
+            MockStorekitExternalPurchasePlatform();
         StorekitExternalPurchasePlatform.instance = fakePlatform;
 
         final result = await plugin.isEligible();
@@ -105,7 +115,8 @@ void main() {
     group('canMakePayments', () {
       test('returns true when payments can be made', () async {
         StorekitExternalPurchase plugin = StorekitExternalPurchase();
-        MockStorekitExternalPurchasePlatform fakePlatform = MockStorekitExternalPurchasePlatform();
+        MockStorekitExternalPurchasePlatform fakePlatform =
+            MockStorekitExternalPurchasePlatform();
         StorekitExternalPurchasePlatform.instance = fakePlatform;
 
         final result = await plugin.canMakePayments();
@@ -117,7 +128,8 @@ void main() {
     group('showNotice', () {
       test('returns cancelled when user cancels', () async {
         StorekitExternalPurchase plugin = StorekitExternalPurchase();
-        MockStorekitExternalPurchasePlatformNull fakePlatform = MockStorekitExternalPurchasePlatformNull();
+        MockStorekitExternalPurchasePlatformNull fakePlatform =
+            MockStorekitExternalPurchasePlatformNull();
         StorekitExternalPurchasePlatform.instance = fakePlatform;
 
         final result = await plugin.showNotice(NoticeType.browser);
@@ -128,7 +140,8 @@ void main() {
     group('token', () {
       test('returns token when available', () async {
         StorekitExternalPurchase plugin = StorekitExternalPurchase();
-        MockStorekitExternalPurchasePlatform fakePlatform = MockStorekitExternalPurchasePlatform();
+        MockStorekitExternalPurchasePlatform fakePlatform =
+            MockStorekitExternalPurchasePlatform();
         StorekitExternalPurchasePlatform.instance = fakePlatform;
 
         final result = await plugin.token(TokenType.acquisition);
@@ -139,7 +152,8 @@ void main() {
 
       test('returns null when not available', () async {
         StorekitExternalPurchase plugin = StorekitExternalPurchase();
-        MockStorekitExternalPurchasePlatformNull fakePlatform = MockStorekitExternalPurchasePlatformNull();
+        MockStorekitExternalPurchasePlatformNull fakePlatform =
+            MockStorekitExternalPurchasePlatformNull();
         StorekitExternalPurchasePlatform.instance = fakePlatform;
 
         final result = await plugin.token(TokenType.acquisition);

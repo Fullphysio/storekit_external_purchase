@@ -1,12 +1,17 @@
 name: storekit_external_purchase
-description: "Flutter plugin to use StoreKit External Purchase (custom link) APIs on Apple platforms. Provides eligibility check, capability check, and notice presentation. iOS only."
-version: 0.0.1
-homepage: 
-repository: https://github.com/Ortes/storekit_external_purchase
+description: "Apple StoreKit External Purchase Custom Link APIs for Flutter: eligibility, the system disclosure notice and External Purchase Server API tokens. iOS only."
+version: 0.1.0
+repository: https://github.com/Fullphysio/storekit_external_purchase
+issue_tracker: https://github.com/Fullphysio/storekit_external_purchase/issues
+topics:
+  - storekit
+  - in-app-purchase
+  - payments
+  - ios
 
 environment:
-  sdk: ^3.9.2
-  flutter: '>=3.3.0'
+  sdk: ^3.9.0
+  flutter: ">=3.44.0"
 
 dependencies:
   flutter:
@@ -16,7 +21,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
   plugin:

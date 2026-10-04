@@ -1,86 +1,60 @@
 # storekit_external_purchase
 
-A Flutter plugin that exposes Apple StoreKit External Purchase (Custom Link) APIs to Flutter.
+Flutter plugin for Apple's [StoreKit External Purchase Custom Link](https://developer.apple.com/documentation/storekit/externalpurchasecustomlink) API: link out of an iOS app to your own payment page (Stripe, Paddle, …) where Apple's EU terms allow it.
 
-This plugin lets you:
-- Check if the device can make App Store payments
-- Check whether the app/account is eligible for the External Purchase Custom Link program
-- Present the required StoreKit notice (browser or in-app) and get the result
+iOS only. Supports Swift Package Manager and CocoaPods.
 
-For more information about Apple's External Purchase APIs, see the [official documentation](https://developer.apple.com/documentation/storekit/external-purchase).
+| Method | StoreKit | Min iOS |
+|--------|----------|---------|
+| `isEligible()` | `ExternalPurchaseCustomLink.isEligible` | 18.1 |
+| `showNotice(NoticeType)` | `ExternalPurchaseCustomLink.showNotice(type:)` | 18.1 |
+| `token(TokenType)` | `ExternalPurchaseCustomLink.token(for:)` | 18.1 |
+| `canMakePayments()` | `AppStore.canMakePayments` | 15 |
+| `getCountryCode()` | `Storefront.current?.countryCode` (alpha-3) | 15 |
 
-Note: External Purchase is available only in EU storefronts and requires specific OS versions. See Requirements.
+Below the minimum, calls throw a `PlatformException` with code `UNSUPPORTED_API` (`getCountryCode` returns `null`).
 
-## Requirements
-- iOS 17.4+ (APIs used for notice presentation require iOS 18.1+)
-- Xcode with an App ID configured for `com.apple.developer.storekit.external-purchase-link`
-- Provisioning profiles regenerated after enabling the entitlement
+## Setup
 
-## Installation
-Add to your `pubspec.yaml`:
+1. Accept the current Apple Developer Program License Agreement and enable **StoreKit External Purchases or Offers (EU)** on your App ID.
+2. Add the entitlement with the storefronts you sell in to your `.entitlements` file:
 
-```yaml
-dependencies:
-  storekit_external_purchase: ^0.0.1
-```
+   ```xml
+   <key>com.apple.developer.storekit.custom-purchase-link.allowed-regions</key>
+   <array>
+     <string>fr</string>
+     <string>de</string>
+   </array>
+   ```
 
-Run `flutter pub get`.
+3. Regenerate the provisioning profiles.
 
-## iOS Setup
-1. Enable the entitlement for your App ID on Apple Developer portal.
-2. In Xcode, ensure your target’s `.entitlements` (`Runner.entitlements`) includes:
-
-```xml
-<key>com.apple.developer.storekit.external-purchase-link</key>
-<true/>
-```
-
-If using the example app, this is already present in `example/ios/Runner/Runner.entitlements` and the project references it via `CODE_SIGN_ENTITLEMENTS`.
-
-On next build or archive, Xcode may fetch a new provisioning profile that includes the entitlement.
-
-## API
-
-```dart
-enum NoticeType { browser, withinApp }
-
-enum NoticeResult { continued, cancelled }
-
-class StorekitExternalPurchase {
-  Future<String?> getCountryCode();
-  Future<bool> isExternalPurchaseAvailable();
-  Future<bool> canMakePayments();
-  Future<NoticeResult> showNotice(NoticeType noticeType);
-}
-```
-
-- `getCountryCode()` returns the current App Store storefront country code (iOS 15+), or null.
-- `isExternalPurchaseAvailable()` returns whether the External Purchase Custom Link is available (iOS 18.1+).
-- `canMakePayments()` proxies `AppStore.canMakePayments` (iOS 15+).
-- `showNotice(NoticeType)` presents Apple’s system notice and resolves to `continued` or `cancelled` (iOS 18.1+).
+`isEligible()` is `true` only when the entitlement is in the signed profile, the person's App Store storefront is in that list, the OS is recent enough and Apple's server-side eligibility allows it.
 
 ## Usage
 
 ```dart
 import 'package:storekit_external_purchase/storekit_external_purchase.dart';
 
-final sdk = StorekitExternalPurchase();
+final storeKit = StorekitExternalPurchase();
 
-Future<void> attemptExternalPurchase() async {
-  final canPay = await sdk.canMakePayments();
-  final eligible = await sdk.isExternalPurchaseAvailable();
-
-  if (!eligible) return;
-
-  // Choose which notice to show based on your flow
-  final result = await sdk.showNotice(NoticeType.withinApp);
-  if (result == NoticeResult.continued) {
-    // Open your external link or proceed with your flow here
+Future<void> buy() async {
+  if (!await storeKit.canMakePayments() || !await storeKit.isEligible()) {
+    return; // fall back to in-app purchase
   }
+  if (await storeKit.showNotice(NoticeType.browser) != NoticeResult.continued) {
+    return;
+  }
+  final token = await storeKit.token(TokenType.acquisition) ??
+      await storeKit.token(TokenType.services);
+  // Send token.value to your server, then open your checkout URL.
 }
 ```
 
-## Notes
-- Ensure your app distribution targets EU storefronts and meets Apple’s policy requirements. For details on communication and promotion of offers on the App Store in the EU, see [Apple's support page](https://developer.apple.com/support/communication-and-promotion-of-offers-on-the-app-store-in-the-eu/).
-- Wrap calls with platform/version checks as needed if you support older iOS versions.
+## Reporting
 
+Apple requires every token and every resulting transaction to be reported to the [External Purchase Server API](https://developer.apple.com/documentation/externalpurchaseserverapi) from your server. This plugin only fetches the tokens.
+
+## License
+
+BSD 3-Clause, see [LICENSE](LICENSE).
