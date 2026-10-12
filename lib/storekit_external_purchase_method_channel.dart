@@ -46,4 +46,20 @@ class MethodChannelStorekitExternalPurchase
     });
     return result != null ? Token(result) : null;
   }
+
+  @override
+  Future<AgeRangeResponse> requestAgeRange(List<int> ageGates) async {
+    final result = await methodChannel.invokeMapMethod<String, Object?>(
+      'requestAgeRange',
+      {'ageGates': ageGates},
+    );
+    return switch (result?['status']) {
+      'sharing' => AgeRangeShared(
+        lowerBound: result!['lowerBound'] as int?,
+        upperBound: result['upperBound'] as int?,
+      ),
+      'declined' => const AgeRangeDeclined(),
+      _ => throw StateError('Invalid age range response: $result'),
+    };
+  }
 }

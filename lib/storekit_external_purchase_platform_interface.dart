@@ -70,6 +70,48 @@ class Token {
   int get hashCode => value.hashCode;
 }
 
+/// The person's answer to an age range request.
+sealed class AgeRangeResponse {
+  const AgeRangeResponse();
+}
+
+/// The person shared an age range. A `null` bound means the range is open on
+/// that side: with an age gate of 18, an adult gets `lowerBound: 18` and
+/// `upperBound: null`.
+final class AgeRangeShared extends AgeRangeResponse {
+  const AgeRangeShared({this.lowerBound, this.upperBound});
+
+  final int? lowerBound;
+  final int? upperBound;
+
+  @override
+  String toString() =>
+      'AgeRangeShared(lowerBound: $lowerBound, upperBound: $upperBound)';
+
+  @override
+  bool operator ==(Object other) =>
+      other is AgeRangeShared &&
+      lowerBound == other.lowerBound &&
+      upperBound == other.upperBound;
+
+  @override
+  int get hashCode => Object.hash(lowerBound, upperBound);
+}
+
+/// The person, or their parent or guardian, declined to share an age range.
+final class AgeRangeDeclined extends AgeRangeResponse {
+  const AgeRangeDeclined();
+
+  @override
+  String toString() => 'AgeRangeDeclined()';
+
+  @override
+  bool operator ==(Object other) => other is AgeRangeDeclined;
+
+  @override
+  int get hashCode => (AgeRangeDeclined).hashCode;
+}
+
 /// The interface platform implementations of this plugin extend.
 abstract class StorekitExternalPurchasePlatform extends PlatformInterface {
   /// Constructs a StorekitExternalPurchasePlatform.
@@ -111,5 +153,9 @@ abstract class StorekitExternalPurchasePlatform extends PlatformInterface {
 
   Future<Token?> token(TokenType tokenType) {
     throw UnimplementedError('token() has not been implemented.');
+  }
+
+  Future<AgeRangeResponse> requestAgeRange(List<int> ageGates) {
+    throw UnimplementedError('requestAgeRange() has not been implemented.');
   }
 }

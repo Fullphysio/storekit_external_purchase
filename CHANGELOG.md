@@ -1,3 +1,7 @@
+## 0.2.0
+
+* `requestAgeRange` over `DeclaredAgeRange`'s `AgeRangeService` (iOS 26+), returning `AgeRangeShared` or `AgeRangeDeclined`.
+
 ## 0.1.0
 
 * First release.

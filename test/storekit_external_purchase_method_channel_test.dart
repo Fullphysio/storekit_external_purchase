@@ -223,5 +223,50 @@ void main() {
         expect(results[2], true);
       });
     });
+
+    group('requestAgeRange', () {
+      test('parses a shared range and sends the age gates', () async {
+        MethodCall? received;
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+              received = methodCall;
+              return {
+                'status': 'sharing',
+                'lowerBound': 18,
+                'upperBound': null,
+              };
+            });
+
+        expect(
+          await platform.requestAgeRange([18]),
+          const AgeRangeShared(lowerBound: 18),
+        );
+        expect(received?.method, 'requestAgeRange');
+        expect(received?.arguments, {
+          'ageGates': [18],
+        });
+      });
+
+      test('parses a declined answer', () async {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+              return {'status': 'declined'};
+            });
+
+        expect(await platform.requestAgeRange([18]), const AgeRangeDeclined());
+      });
+
+      test('throws on an unknown answer', () async {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+              return {'status': 'other'};
+            });
+
+        expect(
+          () => platform.requestAgeRange([18]),
+          throwsA(isInstanceOf<StateError>()),
+        );
+      });
+    });
   });
 }

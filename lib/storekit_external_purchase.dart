@@ -2,7 +2,14 @@
 library;
 
 export 'storekit_external_purchase_platform_interface.dart'
-    show NoticeType, TokenType, NoticeResult, Token;
+    show
+        NoticeType,
+        TokenType,
+        NoticeResult,
+        Token,
+        AgeRangeResponse,
+        AgeRangeShared,
+        AgeRangeDeclined;
 import 'storekit_external_purchase_platform_interface.dart';
 
 /// Entry point to StoreKit's `ExternalPurchaseCustomLink` and related APIs.
@@ -42,5 +49,15 @@ class StorekitExternalPurchase {
   /// StoreKit has none of this type for the current person.
   Future<Token?> token(TokenType tokenType) {
     return StorekitExternalPurchasePlatform.instance.token(tokenType);
+  }
+
+  /// Asks the person to share their age range
+  /// (`AgeRangeService.requestAgeRange(ageGates:_:_:in:)`, iOS 26+).
+  ///
+  /// Pass one to three increasing age gates, such as `[18]`. The system shows
+  /// a sheet the first time and caches the answer. Requires the
+  /// `com.apple.developer.declared-age-range` entitlement.
+  Future<AgeRangeResponse> requestAgeRange(List<int> ageGates) {
+    return StorekitExternalPurchasePlatform.instance.requestAgeRange(ageGates);
   }
 }

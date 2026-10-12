@@ -11,6 +11,7 @@ iOS only. Supports Swift Package Manager and CocoaPods.
 | `token(TokenType)` | `ExternalPurchaseCustomLink.token(for:)` | 18.1 |
 | `canMakePayments()` | `AppStore.canMakePayments` | 15 |
 | `getCountryCode()` | `Storefront.current?.countryCode` (alpha-3) | 15 |
+| `requestAgeRange(List<int>)` | `AgeRangeService.requestAgeRange(ageGates:_:_:in:)` | 26 |
 
 Below the minimum, calls throw a `PlatformException` with code `UNSUPPORTED_API` (`getCountryCode` returns `null`).
 
@@ -27,7 +28,8 @@ Below the minimum, calls throw a `PlatformException` with code `UNSUPPORTED_API`
    </array>
    ```
 
-3. Regenerate the provisioning profiles.
+3. To use `requestAgeRange`, also enable **Declared Age Range** on the App ID and add `<key>com.apple.developer.declared-age-range</key><true/>`.
+4. Regenerate the provisioning profiles.
 
 `isEligible()` is `true` only when the entitlement is in the signed profile, the person's App Store storefront is in that list, the OS is recent enough and Apple's server-side eligibility allows it.
 
@@ -50,6 +52,20 @@ Future<void> buy() async {
   // Send token.value to your server, then open your checkout URL.
 }
 ```
+
+## Age range
+
+Apple requires alternative payments in the EU to sit behind a parental gate for minors. One way is to offer them only to people who confirm they are adults:
+
+```dart
+final response = await storeKit.requestAgeRange([18]);
+final isAdult = switch (response) {
+  AgeRangeShared(:final lowerBound) => (lowerBound ?? 0) >= 18,
+  AgeRangeDeclined() => false,
+};
+```
+
+`DeclaredAgeRange` is weak-linked, so apps with a deployment target below iOS 26 still launch on older systems.
 
 ## Reporting
 

@@ -1,6 +1,6 @@
 name: storekit_external_purchase
-description: "Apple StoreKit External Purchase Custom Link APIs for Flutter: eligibility, the system disclosure notice and External Purchase Server API tokens. iOS only."
-version: 0.1.0
+description: "Apple StoreKit External Purchase Custom Link and Declared Age Range APIs for Flutter: eligibility, disclosure notice, reporting tokens and age range. iOS only."
+version: 0.2.0
 repository: https://github.com/Fullphysio/storekit_external_purchase
 issue_tracker: https://github.com/Fullphysio/storekit_external_purchase/issues
 topics:
