@@ -106,12 +106,26 @@ public class StorekitExternalPurchasePlugin: NSObject, FlutterPlugin {
           @unknown default:
             result(FlutterError(code: "UNKNOWN_AGE_RANGE_RESPONSE", message: "DeclaredAgeRange returned an unknown response", details: nil))
           }
+        } catch let error as AgeRangeService.Error {
+          result(FlutterError(code: Self.ageRangeErrorCode(error), message: "Failed to request the age range", details: String(describing: error)))
         } catch {
           result(FlutterError(code: "AGE_RANGE_REQUEST_FAILED", message: "Failed to request the age range", details: String(describing: error)))
         }
       }
     default:
       result(FlutterMethodNotImplemented)
+    }
+  }
+
+  @available(iOS 26.0, *)
+  private static func ageRangeErrorCode(_ error: AgeRangeService.Error) -> String {
+    switch error {
+    case .notAvailable:
+      return "AGE_RANGE_NOT_AVAILABLE"
+    case .invalidRequest:
+      return "AGE_RANGE_INVALID_REQUEST"
+    @unknown default:
+      return "AGE_RANGE_UNAVAILABLE"
     }
   }
 
