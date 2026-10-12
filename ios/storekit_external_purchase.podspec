@@ -1,9 +1,9 @@
 Pod::Spec.new do |s|
   s.name             = 'storekit_external_purchase'
-  s.version          = '0.1.0'
+  s.version          = '0.2.0'
   s.summary          = 'StoreKit External Purchase Custom Link APIs for Flutter.'
   s.description      = <<-DESC
-Flutter plugin exposing Apple's StoreKit External Purchase Custom Link APIs: eligibility, the system disclosure notice and reporting tokens.
+Flutter plugin exposing Apple's StoreKit External Purchase Custom Link APIs: eligibility, the system disclosure notice and reporting tokens, plus the Declared Age Range request.
                        DESC
   s.homepage         = 'https://github.com/Fullphysio/storekit_external_purchase'
   s.license          = { :file => '../LICENSE' }
@@ -14,6 +14,7 @@ Flutter plugin exposing Apple's StoreKit External Purchase Custom Link APIs: eli
   s.dependency 'Flutter'
   s.platform = :ios, '13.0'
   s.frameworks = 'StoreKit'
+  s.weak_frameworks = 'DeclaredAgeRange'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
   s.swift_version = '5.9'
 end

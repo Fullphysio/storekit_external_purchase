@@ -12,6 +12,7 @@ class MockStorekitExternalPurchasePlatform
   int canMakePaymentsCallCount = 0;
   int showNoticeCallCount = 0;
   int tokenCallCount = 0;
+  int requestAgeRangeCallCount = 0;
 
   @override
   Future<String?> getCountryCode() async {
@@ -42,6 +43,12 @@ class MockStorekitExternalPurchasePlatform
     tokenCallCount++;
     return Token('mock-token');
   }
+
+  @override
+  Future<AgeRangeResponse> requestAgeRange(List<int> ageGates) async {
+    requestAgeRangeCallCount++;
+    return const AgeRangeShared(lowerBound: 18);
+  }
 }
 
 class MockStorekitExternalPurchasePlatformNull
@@ -62,6 +69,10 @@ class MockStorekitExternalPurchasePlatformNull
 
   @override
   Future<Token?> token(TokenType tokenType) => Future.value(null);
+
+  @override
+  Future<AgeRangeResponse> requestAgeRange(List<int> ageGates) =>
+      Future.value(const AgeRangeDeclined());
 }
 
 void main() {
@@ -158,6 +169,29 @@ void main() {
 
         final result = await plugin.token(TokenType.acquisition);
         expect(result, null);
+      });
+    });
+
+    group('requestAgeRange', () {
+      test('returns the shared range', () async {
+        StorekitExternalPurchase plugin = StorekitExternalPurchase();
+        MockStorekitExternalPurchasePlatform fakePlatform =
+            MockStorekitExternalPurchasePlatform();
+        StorekitExternalPurchasePlatform.instance = fakePlatform;
+
+        expect(
+          await plugin.requestAgeRange([18]),
+          const AgeRangeShared(lowerBound: 18),
+        );
+        expect(fakePlatform.requestAgeRangeCallCount, 1);
+      });
+
+      test('returns declined', () async {
+        StorekitExternalPurchase plugin = StorekitExternalPurchase();
+        StorekitExternalPurchasePlatform.instance =
+            MockStorekitExternalPurchasePlatformNull();
+
+        expect(await plugin.requestAgeRange([18]), const AgeRangeDeclined());
       });
     });
 
