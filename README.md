@@ -65,6 +65,8 @@ final isAdult = switch (response) {
 };
 ```
 
+Errors come back as `PlatformException` codes `AGE_RANGE_NOT_AVAILABLE`, `AGE_RANGE_INVALID_REQUEST` and `AGE_RANGE_UNAVAILABLE` (cases added after iOS 26.0: declined onboarding, ineligible account, network). Only iOS 26.0 symbols are referenced, so the plugin builds with Xcode 26.
+
 `DeclaredAgeRange` is weak-linked, so apps with a deployment target below iOS 26 still launch on older systems.
 
 ## Reporting

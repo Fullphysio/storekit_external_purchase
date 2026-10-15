@@ -57,6 +57,11 @@ class StorekitExternalPurchase {
   /// Pass one to three increasing age gates, such as `[18]`. The system shows
   /// a sheet the first time and caches the answer. Requires the
   /// `com.apple.developer.declared-age-range` entitlement.
+  ///
+  /// `AgeRangeService.Error` is thrown as a `PlatformException` with code
+  /// `AGE_RANGE_NOT_AVAILABLE`, `AGE_RANGE_INVALID_REQUEST`, or
+  /// `AGE_RANGE_UNAVAILABLE` for cases added after iOS 26.0 (declined
+  /// onboarding, ineligible account, network); `details` names the case.
   Future<AgeRangeResponse> requestAgeRange(List<int> ageGates) {
     return StorekitExternalPurchasePlatform.instance.requestAgeRange(ageGates);
   }
