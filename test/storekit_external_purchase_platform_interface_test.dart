@@ -40,6 +40,14 @@ void main() {
     test('services has correct value', () {
       expect(TokenType.services.value, 'SERVICES');
     });
+
+    test('inApp has correct value', () {
+      expect(TokenType.inApp.value, 'IN_APP');
+    });
+
+    test('linkOut has correct value', () {
+      expect(TokenType.linkOut.value, 'LINK_OUT');
+    });
   });
 
   group('Token Class', () {
