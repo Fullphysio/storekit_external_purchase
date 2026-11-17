@@ -22,7 +22,14 @@ enum TokenType {
 
   /// The person already acquired through the external link; used for
   /// subsequent purchases and renewals.
-  services('SERVICES');
+  services('SERVICES'),
+
+  /// A purchase processed inside the app. Request it before every potential
+  /// transaction in the EU on iOS 27.2+, and in Brazil and Japan on iOS 26.4+.
+  inApp('IN_APP'),
+
+  /// A purchase on a website the app links out to. Same rules as [inApp].
+  linkOut('LINK_OUT');
 
   const TokenType(this.value);
 
