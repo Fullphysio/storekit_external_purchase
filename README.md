@@ -84,7 +84,9 @@ final isMinor = switch (response) {
 };
 ```
 
-Errors come back as `PlatformException` codes `AGE_RANGE_NOT_AVAILABLE`, `AGE_RANGE_INVALID_REQUEST` and `AGE_RANGE_UNAVAILABLE` (cases added after iOS 26.0: declined onboarding, ineligible account, network). Only iOS 26.0 symbols are referenced, so the plugin builds with Xcode 26.
+`AgeRangeShared.declaration` says how the range was set. Every adult is `selfDeclared`: the birthdate of the Apple Account, with no proof. `isConfirmed` is true when the system checked the age with a credit card, a government ID or a selfie.
+
+Errors come back as `PlatformException` codes `AGE_RANGE_NOT_AVAILABLE`, `AGE_RANGE_INVALID_REQUEST` and `AGE_RANGE_UNAVAILABLE` (cases added after iOS 26.0: declined onboarding, ineligible account, network). Only iOS 26.0 symbols are referenced, so the plugin builds with Xcode 26. The declaration crosses the channel as its Swift case name, so `confirmed` reaches Dart even from an app built with an SDK older than 26.5.
 
 `DeclaredAgeRange` is weak-linked, so apps with a deployment target below iOS 26 still launch on older systems.
 

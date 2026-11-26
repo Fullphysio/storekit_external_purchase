@@ -57,6 +57,9 @@ class MethodChannelStorekitExternalPurchase
       'sharing' => AgeRangeShared(
         lowerBound: result!['lowerBound'] as int?,
         upperBound: result['upperBound'] as int?,
+        declaration: AgeRangeDeclaration.fromName(
+          result['declaration'] as String?,
+        ),
       ),
       'declined' => const AgeRangeDeclined(),
       _ => throw StateError('Invalid age range response: $result'),

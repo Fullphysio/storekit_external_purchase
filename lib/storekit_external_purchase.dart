@@ -9,7 +9,8 @@ export 'storekit_external_purchase_platform_interface.dart'
         Token,
         AgeRangeResponse,
         AgeRangeShared,
-        AgeRangeDeclined;
+        AgeRangeDeclined,
+        AgeRangeDeclaration;
 import 'storekit_external_purchase_platform_interface.dart';
 
 /// Entry point to StoreKit's `ExternalPurchaseCustomLink` and related APIs.

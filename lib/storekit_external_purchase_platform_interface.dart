@@ -82,27 +82,58 @@ sealed class AgeRangeResponse {
   const AgeRangeResponse();
 }
 
+/// How the age range was set (`AgeRangeService.AgeRangeDeclaration`).
+///
+/// On iOS 26.5+, an age confirmed by credit card, government ID or selfie is
+/// [confirmed]. iOS 26.2 to 26.4 name the method instead: [paymentChecked],
+/// [governmentIDChecked], [checkedByOtherMethod] and their guardian forms.
+enum AgeRangeDeclaration {
+  selfDeclared,
+  guardianDeclared,
+  confirmed,
+  paymentChecked,
+  governmentIDChecked,
+  checkedByOtherMethod,
+  guardianPaymentChecked,
+  guardianGovernmentIDChecked,
+  guardianCheckedByOtherMethod;
+
+  /// Parses the Swift case name. A case added in a later iOS is `null`.
+  static AgeRangeDeclaration? fromName(String? name) =>
+      name == null ? null : values.asNameMap()[name];
+
+  /// Whether the system confirmed the age, rather than a person declaring it.
+  bool get isConfirmed => switch (this) {
+    selfDeclared || guardianDeclared => false,
+    _ => true,
+  };
+}
+
 /// The person shared an age range. A `null` bound means the range is open on
 /// that side: with an age gate of 18, an adult gets `lowerBound: 18` and
-/// `upperBound: null`.
+/// `upperBound: null`. [declaration] is `null` when iOS gives none or a case
+/// this version does not know.
 final class AgeRangeShared extends AgeRangeResponse {
-  const AgeRangeShared({this.lowerBound, this.upperBound});
+  const AgeRangeShared({this.lowerBound, this.upperBound, this.declaration});
 
   final int? lowerBound;
   final int? upperBound;
+  final AgeRangeDeclaration? declaration;
 
   @override
   String toString() =>
-      'AgeRangeShared(lowerBound: $lowerBound, upperBound: $upperBound)';
+      'AgeRangeShared(lowerBound: $lowerBound, upperBound: $upperBound, '
+      'declaration: ${declaration?.name})';
 
   @override
   bool operator ==(Object other) =>
       other is AgeRangeShared &&
       lowerBound == other.lowerBound &&
-      upperBound == other.upperBound;
+      upperBound == other.upperBound &&
+      declaration == other.declaration;
 
   @override
-  int get hashCode => Object.hash(lowerBound, upperBound);
+  int get hashCode => Object.hash(lowerBound, upperBound, declaration);
 }
 
 /// The person, or their parent or guardian, declined to share an age range.
