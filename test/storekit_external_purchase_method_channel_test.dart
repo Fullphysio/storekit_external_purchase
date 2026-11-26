@@ -247,6 +247,43 @@ void main() {
         });
       });
 
+      test('parses the declaration', () async {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+              return {
+                'status': 'sharing',
+                'lowerBound': 18,
+                'upperBound': null,
+                'declaration': 'confirmed',
+              };
+            });
+
+        expect(
+          await platform.requestAgeRange([18]),
+          const AgeRangeShared(
+            lowerBound: 18,
+            declaration: AgeRangeDeclaration.confirmed,
+          ),
+        );
+      });
+
+      test('reads an unknown declaration as null', () async {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+              return {
+                'status': 'sharing',
+                'lowerBound': 18,
+                'upperBound': null,
+                'declaration': 'laterCase',
+              };
+            });
+
+        expect(
+          await platform.requestAgeRange([18]),
+          const AgeRangeShared(lowerBound: 18),
+        );
+      });
+
       test('parses a declined answer', () async {
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
             .setMockMethodCallHandler(channel, (MethodCall methodCall) async {

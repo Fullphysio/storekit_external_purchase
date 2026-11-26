@@ -100,7 +100,12 @@ public class StorekitExternalPurchasePlugin: NSObject, FlutterPlugin {
           )
           switch response {
           case let .sharing(range):
-            result(["status": "sharing", "lowerBound": range.lowerBound as Any, "upperBound": range.upperBound as Any])
+            result([
+              "status": "sharing",
+              "lowerBound": range.lowerBound as Any,
+              "upperBound": range.upperBound as Any,
+              "declaration": range.ageRangeDeclaration.map { String(describing: $0) } as Any,
+            ])
           case .declinedSharing:
             result(["status": "declined"])
           @unknown default:
